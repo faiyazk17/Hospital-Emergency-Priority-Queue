@@ -2,6 +2,8 @@
 from copy import deepcopy
 
 # Creating Patient class to store patients' information.
+
+
 class Patient:
 
     def __init__(self, first_name, last_name, priority_level, sequence_number):
@@ -19,7 +21,9 @@ class Patient:
         self.priority_level = priority_level
         self.sequence_number = sequence_number
 
-        self.patient_info = [first_name, last_name, priority_level, sequence_number]
+        self.patient_info = [first_name, last_name,
+                             priority_level, sequence_number]
+
 
 class Priority_Queue:
 
@@ -48,30 +52,30 @@ class Priority_Queue:
         """
         return len(self._values)
 
-    def arrive(self, value):
-        """
-        -------------------------------------------------------
-        A copy of value is appended to the end of the priority queue
-        Python list, and _first is updated as appropriate to the index of
-        value with the highest priority.
-        Use: pq.arrive(value)
-        -------------------------------------------------------
-        Parameters:
-            value - a data element
-        Returns:
-            None
-        -------------------------------------------------------
-        """
-        self._values.append(deepcopy(value))
+    # def arrive(self, value):
+    #     """
+    #     -------------------------------------------------------
+    #     A copy of value is appended to the end of the priority queue
+    #     Python list, and _first is updated as appropriate to the index of
+    #     value with the highest priority.
+    #     Use: pq.arrive(value)
+    #     -------------------------------------------------------
+    #     Parameters:
+    #         value - a data element
+    #     Returns:
+    #         None
+    #     -------------------------------------------------------
+    #     """
+    #     self._values.append(deepcopy(value))
 
-        # Determine whether new value has highest priority.
-        if self._first is None:
-            self._first = 0
+    #     # Determine whether new value has highest priority.
+    #     if self._first is None:
+    #         self._first = 0
 
-        elif value < self._values[self._first]:
-            self._first = len(self._values) - 1
+    #     elif value < self._values[self._first]:
+    #         self._first = len(self._values) - 1
 
-        return
+    #     return
 
     def _set_first(self):
         """
@@ -144,3 +148,40 @@ class Priority_Queue:
         value = deepcopy(self._values[self._first])
 
         return value
+
+    def arrive(self, value):
+        """
+        -------------------------------------------------------
+        A copy of value is inserted into the priority queue Python list
+        in a sorted order based on arrival time and emergency level,
+        and _first is updated as appropriate to the index of value with
+        the highest priority.
+        Use: pq.arrive(value)
+        -------------------------------------------------------
+        Parameters:
+            value - a Patient object
+        Returns:
+            None
+        -------------------------------------------------------
+        """
+        # Ensure value is an instance of Patient.
+        assert isinstance(
+            value, Patient), "Value must be an instance of Patient"
+
+        # Insert the value in a sorted order based on arrival time and emergency level.
+        index = 0
+        while index < len(self._values) and (
+            value.priority_level > self._values[index].priority_level
+            or (value.priority_level == self._values[index].priority_level and value.sequence_number > self._values[index].sequence_number)
+        ):
+            index += 1
+
+        self._values.insert(index, deepcopy(value))
+
+        # Update _first if necessary.
+        if self._first is None or value.priority_level < self._values[self._first].priority_level or (
+            value.priority_level == self._values[self._first].priority_level and value.sequence_number < self._values[self._first].sequence_number
+        ):
+            self._first = index
+
+        return
